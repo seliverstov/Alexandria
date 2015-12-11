@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (requestCode==SCAN_REQUEST && resultCode == Activity.RESULT_OK){
             String query = data.getStringExtra(AddBook.SCAN_CONTENTS);
             Log.i(TAG, query);
-            mSearchView.setQuery(query,false);
+            mSearchView.setQuery(query, false);
+            mSearchView.onActionViewExpanded();
         }
     }
 
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuItem searchItem = menu.findItem(R.id.action_search);
         if (searchItem!=null){
             mSearchView  = (SearchView)searchItem.getActionView();
+            //mSearchView.setIconifiedByDefault(false);
             mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -147,21 +149,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onItemSelected(String ean) {
-        Bundle args = new Bundle();
-        args.putString(BookDetail.EAN_KEY, ean);
+        Log.i(TAG,"EAN: "+ean);
+        if (!IS_TABLET){
+            Intent intent = new Intent(this,DetailsActivity.class);
+            intent.putExtra(BookDetail.EAN_KEY,ean);
+            startActivity(intent);
 
-        BookDetail fragment = new BookDetail();
-        fragment.setArguments(args);
-
-        int id = R.id.container;
-        if(findViewById(R.id.right_container) != null){
-            id = R.id.right_container;
+        }else{
+            Bundle args = new Bundle();
+            args.putString(BookDetail.EAN_KEY, getIntent().getStringExtra(BookDetail.EAN_KEY));
+            BookDetail fragment = new BookDetail();
+            fragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction().replace(R.id.details_fragment_container,fragment).commit();
         }
-        getSupportFragmentManager().beginTransaction()
-                .replace(id, fragment)
-                .addToBackStack("Book Detail")
-                .commit();
-
     }
 
     @Override
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         item.setChecked(true);
         mDrawerLayout.closeDrawers();
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+       /* FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment nextFragment;
 
         switch (item.getItemId()){
@@ -185,12 +185,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             default:
                 return true;
 
-        }
+        }*/
 
-        fragmentManager.beginTransaction()
+       /* fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment)
                 .addToBackStack((String) title)
-                .commit();
+                .commit();*/
         return true;
     }
 

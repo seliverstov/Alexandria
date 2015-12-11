@@ -30,9 +30,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".ScannerActivity"
+        <activity android:name=".DetailsActivity"
             android:parentActivityName=".MainActivity"
-            android:label="Scanner">
+            android:label="Details">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".MainActivity"/>
         </activity>
 
