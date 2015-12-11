@@ -31,4 +31,5 @@
     <string name="pref_startScreen_key">pref_startFragment</string>
     <string name="drawer_header_text">Alexandria</string>
     <string name="action_search">Search</string>
+    <string name="found">Book was added to you list</string>
 </resources>

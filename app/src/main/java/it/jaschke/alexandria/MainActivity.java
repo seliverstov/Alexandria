@@ -30,7 +30,7 @@ import it.jaschke.alexandria.api.Callback;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Callback {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int SCAN_REQUEST = 0;
+
     private DrawerLayout mDrawerLayout;
 
     /**
@@ -43,12 +43,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private CharSequence title;
     public static boolean IS_TABLET = false;
-    private BroadcastReceiver messageReciever;
-
-    public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
-    public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
-
-    SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,51 +68,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ScannerActivity.class);
-                startActivityForResult(intent,SCAN_REQUEST);
+                startActivityForResult(intent,0);
             }
         });
 
         title = getTitle();
 
-        messageReciever = new MessageReciever();
-        IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever,filter);
-
-        NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
+       NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode==SCAN_REQUEST && resultCode == Activity.RESULT_OK){
-            String query = data.getStringExtra(AddBook.SCAN_CONTENTS);
-            Log.i(TAG, query);
-            mSearchView.setQuery(query, false);
-            mSearchView.onActionViewExpanded();
-        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        if (searchItem!=null){
-            mSearchView  = (SearchView)searchItem.getActionView();
-            //mSearchView.setIconifiedByDefault(false);
-            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    Log.i(TAG, query);
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    return false;
-                }
-            });
-        }
         return true;
     }
 
@@ -139,12 +104,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReciever);
-        super.onDestroy();
     }
 
     @Override
@@ -192,15 +151,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .addToBackStack((String) title)
                 .commit();*/
         return true;
-    }
-
-    private class MessageReciever extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getStringExtra(MESSAGE_KEY)!=null){
-                Toast.makeText(MainActivity.this, intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
-            }
-        }
     }
 
     public void goBack(View view){

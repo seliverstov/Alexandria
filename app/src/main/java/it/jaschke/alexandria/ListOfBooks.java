@@ -1,11 +1,20 @@
 package it.jaschke.alexandria;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -17,21 +26,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.regex.Pattern;
 
 import it.jaschke.alexandria.api.BooksAdapter;
 import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.services.BookService;
 
 
 public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ListOfBooks.class.getSimpleName();
+
+    private static final int SCAN_REQUEST = 0;
+
+    public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
+    public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+
     private BooksAdapter bookListAdapter;
     private RecyclerView bookList;
     private SearchView mSearchView;
+    private TextView mBookNotFound;
+
+    private ProgressDialog mProgress;
+    private ResultReceiver mResultReceiver;
+    private BroadcastReceiver messageReciever;
+
 
     private int position = ListView.INVALID_POSITION;
 
-    private final int LOADER_ID = 10;
+    public static final int LOADER_ID = 10;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,54 +65,40 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         setHasOptionsMenu(true);
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         bookListAdapter = new BooksAdapter(getActivity(), null);
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
-        /*searchText = (EditText) rootView.findViewById(R.id.searchText);
-        rootView.findViewById(R.id.searchButton).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ListOfBooks.this.restartLoader();
-                    }
-                }
-        );*/
 
         bookList = (RecyclerView) rootView.findViewById(R.id.listOfBooks);
         bookList.setAdapter(bookListAdapter);
         bookList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        mBookNotFound = (TextView)rootView.findViewById(R.id.book_not_found);
 
-
-        /*bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Cursor cursor = bookListAdapter.getCursor();
-                if (cursor != null && cursor.moveToPosition(position)) {
-                    ((Callback)getActivity())
-                            .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
-                }
-            }
-        });
-*/
         return rootView;
-    }
-
-    private void restartLoader(){
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(TAG,"onCreateLoader");
+        Log.i(TAG, "onCreateLoader");
         final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
 
         String searchString = (mSearchView!=null)?mSearchView.getQuery().toString():"";
 
-        if(searchString.length()>0){
+        if (isQueryMathISBN(searchString)) {
+            return new CursorLoader(
+                    getActivity(),
+                    AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(searchString)),
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        }else if(searchString.length()>0){
             searchString = "%"+searchString+"%";
             return new CursorLoader(
                     getActivity(),
@@ -94,29 +106,31 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null,
                     selection,
                     new String[]{searchString,searchString},
-                    null
-            );
+                    null);
+        }else{
+            return new CursorLoader(
+                    getActivity(),
+                    AlexandriaContract.BookEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
         }
 
-        return new CursorLoader(
-                getActivity(),
-                AlexandriaContract.BookEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(TAG, "onLoadFinished");
-        if (data!=null){
-            Log.i(TAG, "cursor size "+data.getCount());
-        }
-        bookListAdapter.swapCursor(data);
-        if (position != ListView.INVALID_POSITION) {
-            bookList.smoothScrollToPosition(position);
+        if (data==null || data.getCount()==0){
+
+            mBookNotFound.setVisibility(View.VISIBLE);
+        }else {
+            Log.i(TAG,"data count "+ data.getCount());
+            mBookNotFound.setVisibility(View.GONE);
+            bookListAdapter.swapCursor(data);
+            if (position != ListView.INVALID_POSITION) {
+                bookList.smoothScrollToPosition(position);
+            }
         }
     }
 
@@ -130,12 +144,82 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         MenuItem searchItem = menu.findItem(R.id.action_search);
         if (searchItem!=null){
             mSearchView  = (SearchView)searchItem.getActionView();
+            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    if (Pattern.compile("[\\d]{10}|[\\d]]{13}").matcher(query).find()) {
+                        if (query.length() == 10 && !query.startsWith("978")) {
+                            query = "978" + query;
+                        }
+                        mProgress = ProgressDialog.show(getActivity(), "Search",
+                                "Lookup info for book with ISBN " + query, true);
+
+                        Intent bookIntent = new Intent(getActivity(), BookService.class);
+                        bookIntent.putExtra(BookService.EAN, query);
+                        bookIntent.setAction(BookService.FETCH_BOOK);
+                        getActivity().startService(bookIntent);
+
+                    } else {
+                        getLoaderManager().restartLoader(LOADER_ID, null, ListOfBooks.this);
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+            });
+
+            mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    getLoaderManager().restartLoader(LOADER_ID, null, ListOfBooks.this);
+                    return false;
+                }
+            });
         }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(LOADER_ID,null,this).forceLoad();
+
+        messageReciever = new BroadcastReceiver(){
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra(MESSAGE_KEY);
+                if(message!=null){
+                    mProgress.dismiss();
+                    Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
+                    getLoaderManager().restartLoader(LOADER_ID, null, ListOfBooks.this);
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(messageReciever, filter);
+        getLoaderManager().initLoader(LOADER_ID, null, this).forceLoad();
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==SCAN_REQUEST && resultCode == Activity.RESULT_OK){
+            String query = data.getStringExtra(AddBook.SCAN_CONTENTS);
+            Log.i(TAG, query);
+            mSearchView.setQuery(query, false);
+            mSearchView.onActionViewExpanded();
+        }
+    }
+
+    boolean isQueryMathISBN(String query){
+        return Pattern.compile("[\\d]{10}|[\\d]]{13}").matcher(query).find();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(messageReciever);
     }
 }
