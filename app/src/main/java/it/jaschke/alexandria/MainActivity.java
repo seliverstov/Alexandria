@@ -1,11 +1,13 @@
 package it.jaschke.alexandria;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,7 +17,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +29,8 @@ import it.jaschke.alexandria.api.Callback;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Callback {
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int SCAN_REQUEST = 0;
     private DrawerLayout mDrawerLayout;
 
     /**
@@ -41,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+
+    SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +69,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
 
+        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ScannerActivity.class);
+                startActivityForResult(intent,SCAN_REQUEST);
+            }
+        });
+
         title = getTitle();
 
         messageReciever = new MessageReciever();
@@ -72,15 +89,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
    }
 
-
-
-
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==SCAN_REQUEST && resultCode == Activity.RESULT_OK){
+            String query = data.getStringExtra(AddBook.SCAN_CONTENTS);
+            Log.i(TAG, query);
+            mSearchView.setQuery(query,false);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-            getMenuInflater().inflate(R.menu.main, menu);
-            return true;
+        getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        if (searchItem!=null){
+            mSearchView  = (SearchView)searchItem.getActionView();
+            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    Log.i(TAG, query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+            });
+        }
+        return true;
     }
 
     @Override
@@ -94,9 +131,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.action_settings:
+            /*case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
-                return true;
+                return true;*/
             default:
                 return super.onOptionsItemSelected(item);
         }
