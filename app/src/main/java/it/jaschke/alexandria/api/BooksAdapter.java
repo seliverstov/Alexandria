@@ -1,16 +1,20 @@
 package it.jaschke.alexandria.api;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.skyfishjy.CursorRecyclerViewAdapter;
 import com.squareup.picasso.Picasso;
@@ -31,6 +35,7 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
         public final TextView bookTitle;
         public final TextView bookSubTitle;
         public final CardView cardView;
+        public final ProgressBar loading;
 
         public ViewHolder(View view) {
             super(view);
@@ -38,6 +43,7 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
             bookTitle = (TextView) view.findViewById(R.id.listBookTitle);
             bookSubTitle = (TextView) view.findViewById(R.id.listBookSubTitle);
             cardView = (CardView) view.findViewById(R.id.card_view);
+            loading = (ProgressBar) view.findViewById(R.id.listBookLoading);
         }
     }
 
@@ -52,24 +58,37 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
         if (imgUrl!=null) {
             Uri url = Uri.parse(imgUrl);
             Picasso.with(mContext).load(url).into(viewHolder.bookCover);
+        }else{
+            viewHolder.bookCover.setImageDrawable(mContext.getDrawable(R.drawable.ic_launcher));
         }
-
-        String bookTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
-        viewHolder.bookTitle.setText(bookTitle);
-
-        String bookSubTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
-        viewHolder.bookSubTitle.setText(bookSubTitle);
 
         final String ean = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID));
 
-        viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Callback callback = (Callback)mContext;
-                callback.onItemSelected(ean);
-            }
-        });
+        final String bookTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
+        Log.i(TAG, "Title " + bookTitle + ", ISBN " + ean);
+        if (!ean.equals(bookTitle)) {
+            viewHolder.bookTitle.setText(bookTitle);
+            viewHolder.loading.setVisibility(View.GONE);
+            viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Callback callback = (Callback) mContext;
+                    callback.onItemSelected(ean);
+                }
+            });
+        }else{
+            viewHolder.bookTitle.setText("Loading ISBN: "+ean);
+            viewHolder.loading.setVisibility(View.VISIBLE);
+            viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext,"Book with ISBN:"+ean+" isn't loaded yet!",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
+        String bookSubTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
+        viewHolder.bookSubTitle.setText(bookSubTitle);
     }
 
     @Override

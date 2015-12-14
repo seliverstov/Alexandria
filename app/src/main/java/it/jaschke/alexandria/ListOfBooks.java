@@ -40,10 +40,13 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     private static final String TAG = ListOfBooks.class.getSimpleName();
 
+    private static final String SORT_ORDER = AlexandriaContract.BookEntry.CREATED_AT+" desc";
+
     private static final int SCAN_REQUEST = 0;
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+    public static final String MESSAGE_IS_FOUND = "MESSAGE_IS_FOUND";
 
     private BooksAdapter bookListAdapter;
     private RecyclerView bookList;
@@ -89,16 +92,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
         String searchString = (mSearchView!=null)?mSearchView.getQuery().toString():"";
 
-        if (isQueryMathISBN(searchString)) {
-            return new CursorLoader(
-                    getActivity(),
-                    AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(searchString)),
-                    null,
-                    null,
-                    null,
-                    null
-            );
-        }else if(searchString.length()>0){
+        if(!isQueryMathISBN(searchString) && searchString.length()>0){
             searchString = "%"+searchString+"%";
             return new CursorLoader(
                     getActivity(),
@@ -106,7 +100,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null,
                     selection,
                     new String[]{searchString,searchString},
-                    null);
+                    SORT_ORDER);
         }else{
             return new CursorLoader(
                     getActivity(),
@@ -114,9 +108,8 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null,
                     null,
                     null,
-                    null);
+                    SORT_ORDER);
         }
-
     }
 
     @Override
@@ -147,21 +140,20 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    if (Pattern.compile("[\\d]{10}|[\\d]]{13}").matcher(query).find()) {
+                    if (Pattern.compile("(^[\\d]{10}$)|(^[\\d]{13}$)").matcher(query).find()) {
                         if (query.length() == 10 && !query.startsWith("978")) {
                             query = "978" + query;
                         }
-                        mProgress = ProgressDialog.show(getActivity(), "Search",
-                                "Lookup info for book with ISBN " + query, true);
+                        /*mProgress = ProgressDialog.show(getActivity(), "Search",
+                                "Lookup info for book with ISBN " + query, true);*/
 
                         Intent bookIntent = new Intent(getActivity(), BookService.class);
                         bookIntent.putExtra(BookService.EAN, query);
                         bookIntent.setAction(BookService.FETCH_BOOK);
                         getActivity().startService(bookIntent);
-
-                    } else {
-                        getLoaderManager().restartLoader(LOADER_ID, null, ListOfBooks.this);
+                        mSearchView.setQuery("", false);
                     }
+                    getLoaderManager().restartLoader(LOADER_ID, null, ListOfBooks.this);
                     return false;
                 }
 
@@ -189,11 +181,11 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                String message = intent.getStringExtra(MESSAGE_KEY);
-                if(message!=null){
-                    mProgress.dismiss();
-                    Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
-                    getLoaderManager().restartLoader(LOADER_ID, null, ListOfBooks.this);
+                if (intent.getAction()==MESSAGE_EVENT){
+                    String ean = intent.getStringExtra(MESSAGE_KEY);
+                    Boolean isFound = intent.getBooleanExtra(MESSAGE_IS_FOUND,false);
+                    String message = "Book %s was %s";
+                    Toast.makeText(context,(isFound)?String.format(message,ean," added to your list"):String.format(message,ean," not found"),Toast.LENGTH_SHORT).show();
                 }
             }
         };

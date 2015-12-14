@@ -212,13 +212,14 @@ public class BookProvider extends ContentProvider {
         Uri returnUri;
         switch (match) {
             case BOOK: {
-                long _id = db.insert(AlexandriaContract.BookEntry.TABLE_NAME, null, values);
+                long _id = db.replace(AlexandriaContract.BookEntry.TABLE_NAME, null, values);
                 if ( _id > 0 ){
                     returnUri = AlexandriaContract.BookEntry.buildBookUri(_id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
-                getContext().getContentResolver().notifyChange(AlexandriaContract.BookEntry.buildFullBookUri(_id), null);
+                //getContext().getContentResolver().notifyChange(AlexandriaContract.BookEntry.buildFullBookUri(_id), null);
+                getContext().getContentResolver().notifyChange(uri, null);
                 break;
             }
             case AUTHOR:{

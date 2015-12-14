@@ -3,52 +3,51 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
     android:layout_gravity="center"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:contentPadding="2dp"
     app:cardUseCompatPadding="true"
     app:cardCornerRadius="6dp">
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-            <ImageView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
             android:id="@+id/fullBookCover"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="6dip"
+            android:layout_height="wrap_content"
             android:contentDescription="@string/book_cover"
             android:src="@drawable/ic_launcher" />
-
-        <TextView
-            android:id="@+id/listBookTitle"
-            android:layout_width="fill_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/listBookTitle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:textAppearance="@android:style/TextAppearance.Medium"/>
+            <TextView
+                android:id="@+id/listBookSubTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"/>
+        </LinearLayout>
+        <ProgressBar
+            android:id="@+id/listBookLoading"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignWithParentIfMissing="true"
-            android:layout_toRightOf="@id/fullBookCover"
-            android:gravity="center_vertical"
-            android:ellipsize="end"
-            android:layout_marginRight="10dp"
-            android:maxLines="1"
-            android:textSize="16sp" />
-
-
-        <TextView
-            android:id="@+id/listBookSubTitle"
-            android:layout_width="fill_parent"
-            android:layout_height="26dip"
-            android:singleLine="true"
-            android:textSize="12sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/fullBookCover"
-            android:layout_toEndOf="@+id/fullBookCover"/>
-
-
-    </RelativeLayout>
+            android:visibility="visible"
+            android:layout_gravity="center_vertical|right"
+            style="@android:style/Widget.ProgressBar.Large" />
+    </LinearLayout>
 </android.support.v7.widget.CardView>

@@ -1,7 +1,10 @@
 package it.jaschke.alexandria;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -26,6 +29,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import it.jaschke.alexandria.api.Callback;
+import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.sync.SyncAdapter;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Callback {
@@ -74,8 +79,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         title = getTitle();
 
-       NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        SyncAdapter.syncNow(this);
 
    }
 

@@ -160,9 +160,11 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
 
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
+        if(imgUrl!=null && Patterns.WEB_URL.matcher(imgUrl).matches()){
             Uri url = Uri.parse(imgUrl);
             Picasso.with(getActivity()).load(url).into(mCover);
+        }else{
+            mCover.setImageDrawable(getActivity().getDrawable(R.drawable.ic_launcher));
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
