@@ -16,7 +16,7 @@ public class DetailsActivity  extends AppCompatActivity{
             args.putString(BookDetail.EAN_KEY, getIntent().getStringExtra(BookDetail.EAN_KEY));
             BookDetail fragment = new BookDetail();
             fragment.setArguments(args);
-            getSupportFragmentManager().beginTransaction().replace(R.id.details_fragment_container,fragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.book_container,fragment).commit();
         }
 
     }

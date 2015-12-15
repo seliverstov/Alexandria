@@ -63,7 +63,13 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            ean = arguments.getString(BookDetail.EAN_KEY);
+        }else{
+            rootView = inflater.inflate(R.layout.no_book, container, false);
+            return rootView;
+        }
 
         rootView = inflater.inflate(R.layout.fragment_details, container, false);
 
@@ -74,7 +80,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-       mDelete.setOnClickListener(new View.OnClickListener() {
+        mDelete.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
                Intent bookIntent = new Intent(getActivity(), BookService.class);
@@ -83,19 +89,9 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
                getActivity().startService(bookIntent);
                getActivity().finish();
            }
-       });
-
+        });
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
         return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            ean = arguments.getString(BookDetail.EAN_KEY);
-            getLoaderManager().restartLoader(LOADER_ID, null, this);
-        }
     }
 
     @Override

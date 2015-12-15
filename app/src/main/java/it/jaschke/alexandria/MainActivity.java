@@ -35,6 +35,7 @@ import it.jaschke.alexandria.sync.SyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Callback {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String BOOK_FRAGMENT_TAG = "BOOK_FRAGMENT_TAG";
 
     private DrawerLayout mDrawerLayout;
 
@@ -53,18 +54,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IS_TABLET = isTablet();
+        /*IS_TABLET = isTablet();
         if(IS_TABLET){
             setContentView(R.layout.activity_main_tablet);
         }else {
             setContentView(R.layout.activity_main);
-        }
+        }*/
+
+        setContentView(R.layout.activity_main);
+
+
+
+
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar =  getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        IS_TABLET = (findViewById(R.id.book_container)==null)?false:true;
+        if (IS_TABLET) {
+            if (savedInstanceState == null || getSupportFragmentManager().findFragmentByTag(BOOK_FRAGMENT_TAG) == null) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.book_container, new BookDetail(), BOOK_FRAGMENT_TAG).commit();
+            }
+        }
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
 
@@ -92,6 +106,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!IS_TABLET){
+            menu.removeItem(R.id.action_share);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -123,10 +145,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }else{
             Bundle args = new Bundle();
-            args.putString(BookDetail.EAN_KEY, getIntent().getStringExtra(BookDetail.EAN_KEY));
+            args.putString(BookDetail.EAN_KEY, ean);
             BookDetail fragment = new BookDetail();
             fragment.setArguments(args);
-            getSupportFragmentManager().beginTransaction().replace(R.id.details_fragment_container,fragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.book_container,fragment,BOOK_FRAGMENT_TAG).commit();
         }
     }
 
