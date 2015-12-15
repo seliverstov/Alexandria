@@ -32,9 +32,15 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
+        //Sort Order
         Preference p = findPreference(getString(R.string.pref_sort_key));
         onPreferenceChange(p,PreferenceManager.getDefaultSharedPreferences(p.getContext()).getString(p.getKey(),p.getContext().getString(R.string.pref_sort_default)));
         p.setOnPreferenceChangeListener(this);
+        //Search View
+        p = findPreference(getString(R.string.pref_search_key));
+        onPreferenceChange(p,PreferenceManager.getDefaultSharedPreferences(p.getContext()).getString(p.getKey(),p.getContext().getString(R.string.pref_search_default)));
+        p.setOnPreferenceChangeListener(this);
+
         return view;
     }
 }

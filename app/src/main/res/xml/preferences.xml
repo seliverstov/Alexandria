@@ -13,4 +13,11 @@
         android:entryValues="@array/pref_sort_values"
         />
 
+    <ListPreference
+        android:key="@string/pref_search_key"
+        android:title="@string/pref_search"
+        android:entries="@array/pref_search_options"
+        android:entryValues="@array/pref_search_values"
+        />
+
 </PreferenceScreen>

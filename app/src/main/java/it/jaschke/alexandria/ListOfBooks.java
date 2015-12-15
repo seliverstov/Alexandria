@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -152,6 +153,9 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
+                    if (newText == null || "".equals(newText)) {
+                        getLoaderManager().restartLoader(LOADER_ID, null, ListOfBooks.this);
+                    }
                     return false;
                 }
             });
@@ -163,6 +167,11 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     return false;
                 }
             });
+
+            mSearchView.setIconifiedByDefault(settingsManager.isSearchViewIconified());
+            mSearchView.setIconified(settingsManager.isSearchViewIconified());
+            mSearchView.clearFocus();
+            mSearchView.setQueryHint(getActivity().getString(R.string.search_hint));
         }
     }
 
@@ -212,6 +221,10 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getActivity().getString(R.string.pref_sort_key))){
             getLoaderManager().restartLoader(LOADER_ID, null, this);
+        }else if (key.equals(getActivity().getString(R.string.pref_search_key))){
+            mSearchView.setIconifiedByDefault(settingsManager.isSearchViewIconified());
+            mSearchView.setIconified(settingsManager.isSearchViewIconified());
+            mSearchView.clearFocus();
         }
     }
 }

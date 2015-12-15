@@ -38,11 +38,18 @@
     <string name="action_about">About this App</string>
     <string name="title_activity_about">About this App</string>
 
-    <string name="pref_sort">Sort Order</string>
+    <string name="pref_sort">List Sort Order</string>
     <string name="pref_sort_key">pref_sort_key</string>
     <string name="pref_sort_default">1</string>
     <string name="sort_by_date_asc">Sort by Date (asc)</string>
     <string name="sort_by_date_desc">Sort by Date (desc)</string>
     <string name="sort_by_title_asc">Sort by Title (asc)</string>
     <string name="sort_by_title_desc">Sort by Title (desc)</string>
+
+    <string name="pref_search">Search View Mode</string>
+    <string name="pref_search_key">pref_search_key</string>
+    <string name="pref_search_default">1</string>
+    <string name="search_expanded">Expanded</string>
+    <string name="search_collapsed">Collapsed</string>
+    <string name="search_hint">Enter ISBN to add new book</string>
 </resources>

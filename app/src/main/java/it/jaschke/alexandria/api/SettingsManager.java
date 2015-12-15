@@ -19,6 +19,8 @@ public class SettingsManager {
     public static final int SORT_ORDER_TITLE_ASC = 2;
     public static final int SORT_ORDER_TITLE_DESC = 3;
 
+    public static final int SEARCH_VIEW_EXPANDED = 0;
+    public static final int SEARCH_VIEW_COLLAPSED = 1;
 
     public SettingsManager(Context context){
         mContext = context;
@@ -37,10 +39,24 @@ public class SettingsManager {
     public String getSortOrderForDb(){
         switch (getCurrentSortOrder()){
             case SORT_ORDER_DATE_ASC: return AlexandriaContract.BookEntry.CREATED_AT +" ASC";
-            case SORT_ORDER_DATE_DESC: return AlexandriaContract.BookEntry.CREATED_AT +" ASC";
+            case SORT_ORDER_DATE_DESC: return AlexandriaContract.BookEntry.CREATED_AT +" DESC";
             case SORT_ORDER_TITLE_ASC: return AlexandriaContract.BookEntry.TITLE +" ASC";
             case SORT_ORDER_TITLE_DESC: return AlexandriaContract.BookEntry.TITLE +" DESC";
             default: return null;
         }
     }
+
+    public int getCurrentSearchViewMode(){
+        int searchViewMode = Integer.valueOf(mSp.getString(mContext.getString(R.string.pref_search_key), String.valueOf(SEARCH_VIEW_COLLAPSED)));
+        return searchViewMode;
+    }
+
+    public void setCurrentSearchViewMode(int searchViewMode){
+        mSp.edit().putString(mContext.getString(R.string.pref_search_key),String.valueOf(searchViewMode)).apply();
+    }
+
+    public boolean isSearchViewIconified(){
+        return SEARCH_VIEW_COLLAPSED == getCurrentSearchViewMode();
+    }
+
 }
