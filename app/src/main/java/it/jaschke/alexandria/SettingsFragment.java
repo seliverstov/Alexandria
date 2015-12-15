@@ -32,8 +32,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        Preference p = findPreference(getString(R.string.pref_startScreen_key));
-        onPreferenceChange(p,PreferenceManager.getDefaultSharedPreferences(p.getContext()).getString(p.getKey(),""));
+        Preference p = findPreference(getString(R.string.pref_sort_key));
+        onPreferenceChange(p,PreferenceManager.getDefaultSharedPreferences(p.getContext()).getString(p.getKey(),p.getContext().getString(R.string.pref_sort_default)));
         p.setOnPreferenceChangeListener(this);
         return view;
     }

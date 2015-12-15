@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,15 +30,14 @@ import android.widget.Toast;
 import java.util.regex.Pattern;
 
 import it.jaschke.alexandria.api.BooksAdapter;
+import it.jaschke.alexandria.api.SettingsManager;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
 
 
-public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = ListOfBooks.class.getSimpleName();
-
-    private static final String SORT_ORDER = AlexandriaContract.BookEntry.CREATED_AT+" DESC";
 
     private static final int SCAN_REQUEST = 0;
 
@@ -51,6 +51,8 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     private TextView mBookNotFound;
 
     private BroadcastReceiver messageReceiver;
+
+    private SettingsManager settingsManager;
 
     private int position = ListView.INVALID_POSITION;
 
@@ -94,7 +96,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null,
                     selection,
                     new String[]{searchString,searchString},
-                    SORT_ORDER);
+                    settingsManager.getSortOrderForDb());
         }else{
             return new CursorLoader(
                     getActivity(),
@@ -102,7 +104,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null,
                     null,
                     null,
-                    SORT_ORDER);
+                    settingsManager.getSortOrderForDb());
         }
     }
 
@@ -167,7 +169,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        settingsManager = new SettingsManager(getActivity());
         messageReceiver = new BroadcastReceiver(){
 
             @Override
@@ -204,5 +206,12 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(messageReceiver);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getActivity().getString(R.string.pref_sort_key))){
+            getLoaderManager().restartLoader(LOADER_ID, null, this);
+        }
     }
 }

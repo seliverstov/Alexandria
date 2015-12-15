@@ -7,10 +7,10 @@
     >
 
     <ListPreference
-        android:key="@string/pref_startScreen_key"
-        android:title="@string/pref_startScreen"
-        android:entries="@array/pref_start_options"
-        android:entryValues="@array/pref_start_values"
+        android:key="@string/pref_sort_key"
+        android:title="@string/pref_sort"
+        android:entries="@array/pref_sort_options"
+        android:entryValues="@array/pref_sort_values"
         />
 
 </PreferenceScreen>
