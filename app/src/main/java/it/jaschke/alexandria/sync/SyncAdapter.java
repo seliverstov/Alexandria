@@ -48,8 +48,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
             Cursor bookEntry = provider.query(
                     AlexandriaContract.BookEntry.CONTENT_URI,
                     new String[]{AlexandriaContract.BookEntry._ID}, // leaving "columns" null just returns all the columns.
-                    AlexandriaContract.BookEntry.CREATED_AT+" is null", // cols for "where" clause
-                    null, // values for "where" clause
+                    AlexandriaContract.BookEntry.IS_NEW+" = ?", // cols for "where" clause
+                    new String[]{"1"}, // values for "where" clause
                     null  // sort order
             );
 
@@ -61,8 +61,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                 HttpURLConnection urlConnection = null;
                 BufferedReader reader = null;
                 String bookJsonString = null;
-
-
 
                 try {
                     final String FORECAST_BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
@@ -130,55 +128,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                     JSONArray bookArray;
                     if(bookJson.has(ITEMS)){
                         bookArray = bookJson.getJSONArray(ITEMS);
+
+                        JSONObject bookInfo = ((JSONObject) bookArray.get(0)).getJSONObject(VOLUME_INFO);
+
+                        String title = bookInfo.getString(TITLE);
+
+                        String subtitle = "";
+                        if(bookInfo.has(SUBTITLE)) {
+                            subtitle = bookInfo.getString(SUBTITLE);
+                        }
+
+                        String desc="";
+                        if(bookInfo.has(DESC)){
+                            desc = bookInfo.getString(DESC);
+                        }
+
+                        String imgUrl = "";
+                        if(bookInfo.has(IMG_URL_PATH) && bookInfo.getJSONObject(IMG_URL_PATH).has(IMG_URL)) {
+                            imgUrl = bookInfo.getJSONObject(IMG_URL_PATH).getString(IMG_URL);
+                        }
+
+                        writeBackBook(provider, ean, title, subtitle, desc, imgUrl);
+
+                        if(bookInfo.has(AUTHORS)) {
+                            writeBackAuthors(provider,ean, bookInfo.getJSONArray(AUTHORS));
+                        }
+                        if(bookInfo.has(CATEGORIES)){
+                            writeBackCategories(provider,ean,bookInfo.getJSONArray(CATEGORIES) );
+                        }
+
+                        Intent messageIntent = new Intent(ListOfBooks.MESSAGE_EVENT);
+                        messageIntent.putExtra(ListOfBooks.MESSAGE_KEY,ean);
+                        messageIntent.putExtra(ListOfBooks.MESSAGE_IS_FOUND,true);
+                        LocalBroadcastManager.getInstance(getContext().getApplicationContext()).sendBroadcast(messageIntent);
                     }else{
                         provider.delete(AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(ean)),null,null);
                         Intent messageIntent = new Intent(ListOfBooks.MESSAGE_EVENT);
                         messageIntent.putExtra(ListOfBooks.MESSAGE_KEY,ean);
                         messageIntent.putExtra(ListOfBooks.MESSAGE_IS_FOUND,false);
                         LocalBroadcastManager.getInstance(getContext().getApplicationContext()).sendBroadcast(messageIntent);
-                        return;
                     }
-
-                    JSONObject bookInfo = ((JSONObject) bookArray.get(0)).getJSONObject(VOLUME_INFO);
-
-                    String title = bookInfo.getString(TITLE);
-
-                    String subtitle = "";
-                    if(bookInfo.has(SUBTITLE)) {
-                        subtitle = bookInfo.getString(SUBTITLE);
-                    }
-
-                    String desc="";
-                    if(bookInfo.has(DESC)){
-                        desc = bookInfo.getString(DESC);
-                    }
-
-                    String imgUrl = "";
-                    if(bookInfo.has(IMG_URL_PATH) && bookInfo.getJSONObject(IMG_URL_PATH).has(IMG_URL)) {
-                        imgUrl = bookInfo.getJSONObject(IMG_URL_PATH).getString(IMG_URL);
-                    }
-
-                    writeBackBook(provider, ean, title, subtitle, desc, imgUrl);
-
-                    if(bookInfo.has(AUTHORS)) {
-                        writeBackAuthors(provider,ean, bookInfo.getJSONArray(AUTHORS));
-                    }
-                    if(bookInfo.has(CATEGORIES)){
-                        writeBackCategories(provider,ean,bookInfo.getJSONArray(CATEGORIES) );
-                    }
-
-                    Intent messageIntent = new Intent(ListOfBooks.MESSAGE_EVENT);
-                    messageIntent.putExtra(ListOfBooks.MESSAGE_KEY,ean);
-                    messageIntent.putExtra(ListOfBooks.MESSAGE_IS_FOUND,true);
-                    LocalBroadcastManager.getInstance(getContext().getApplicationContext()).sendBroadcast(messageIntent);
-                    return;
-
                 } catch (JSONException e) {
                     Log.e(TAG, "Error ", e);
                 } catch (RemoteException e){
                     Log.e(TAG, "Error ", e);
                 }
-
             }while(bookEntry.moveToNext());
         }catch (RemoteException e){
             Log.e(TAG, "Error ", e);
@@ -196,6 +190,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
         values.put(AlexandriaContract.BookEntry.SUBTITLE, subtitle);
         values.put(AlexandriaContract.BookEntry.DESC, desc);
         values.put(AlexandriaContract.BookEntry.CREATED_AT, System.currentTimeMillis());
+        values.put(AlexandriaContract.BookEntry.IS_NEW, 0);
         provider.insert(AlexandriaContract.BookEntry.CONTENT_URI, values);
     }
 

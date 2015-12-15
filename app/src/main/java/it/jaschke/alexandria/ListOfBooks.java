@@ -1,15 +1,12 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -40,7 +37,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     private static final String TAG = ListOfBooks.class.getSimpleName();
 
-    private static final String SORT_ORDER = AlexandriaContract.BookEntry.CREATED_AT+" desc";
+    private static final String SORT_ORDER = AlexandriaContract.BookEntry.CREATED_AT+" DESC";
 
     private static final int SCAN_REQUEST = 0;
 
@@ -53,10 +50,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     private SearchView mSearchView;
     private TextView mBookNotFound;
 
-    private ProgressDialog mProgress;
-    private ResultReceiver mResultReceiver;
-    private BroadcastReceiver messageReciever;
-
+    private BroadcastReceiver messageReceiver;
 
     private int position = ListView.INVALID_POSITION;
 
@@ -144,9 +138,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                         if (query.length() == 10 && !query.startsWith("978")) {
                             query = "978" + query;
                         }
-                        /*mProgress = ProgressDialog.show(getActivity(), "Search",
-                                "Lookup info for book with ISBN " + query, true);*/
-
                         Intent bookIntent = new Intent(getActivity(), BookService.class);
                         bookIntent.putExtra(BookService.EAN, query);
                         bookIntent.setAction(BookService.FETCH_BOOK);
@@ -177,7 +168,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        messageReciever = new BroadcastReceiver(){
+        messageReceiver = new BroadcastReceiver(){
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -190,7 +181,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             }
         };
         IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(messageReciever, filter);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(messageReceiver, filter);
         getLoaderManager().initLoader(LOADER_ID, null, this).forceLoad();
     }
 
@@ -212,6 +203,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(messageReciever);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(messageReceiver);
     }
 }

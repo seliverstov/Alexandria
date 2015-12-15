@@ -103,6 +103,8 @@ public class BookService extends IntentService {
         ContentValues values= new ContentValues();
         values.put(AlexandriaContract.BookEntry._ID, ean);
         values.put(AlexandriaContract.BookEntry.TITLE, ean);
+        values.put(AlexandriaContract.BookEntry.CREATED_AT, System.currentTimeMillis());
+        values.put(AlexandriaContract.BookEntry.IS_NEW, 1);
         getContentResolver().insert(AlexandriaContract.BookEntry.CONTENT_URI, values);
 
         SyncAdapter.syncNow(this);

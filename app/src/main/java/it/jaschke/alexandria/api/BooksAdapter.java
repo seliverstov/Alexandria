@@ -1,10 +1,10 @@
 package it.jaschke.alexandria.api;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,7 +21,6 @@ import com.squareup.picasso.Picasso;
 
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
-import it.jaschke.alexandria.services.DownloadImage;
 
 /**
  * Created by saj on 11/01/15.
@@ -59,15 +58,20 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
             Uri url = Uri.parse(imgUrl);
             Picasso.with(mContext).load(url).into(viewHolder.bookCover);
         }else{
-            viewHolder.bookCover.setImageDrawable(mContext.getDrawable(R.drawable.ic_launcher));
+            viewHolder.bookCover.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.ic_launcher));
         }
 
         final String ean = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID));
 
         final String bookTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
-        Log.i(TAG, "Title " + bookTitle + ", ISBN " + ean);
-        if (!ean.equals(bookTitle)) {
+
+        final String bookSubTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
+
+        final int is_new = cursor.getInt(cursor.getColumnIndex(AlexandriaContract.BookEntry.IS_NEW));
+
+        if (is_new!=1) {
             viewHolder.bookTitle.setText(bookTitle);
+            viewHolder.bookSubTitle.setText("ISBN: "+ean);
             viewHolder.loading.setVisibility(View.GONE);
             viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -77,7 +81,8 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
                 }
             });
         }else{
-            viewHolder.bookTitle.setText("Loading ISBN: "+ean);
+            viewHolder.bookTitle.setText("ISBN: "+ean);
+            viewHolder.bookSubTitle.setText("Loading...");
             viewHolder.loading.setVisibility(View.VISIBLE);
             viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -87,8 +92,7 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
             });
         }
 
-        String bookSubTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
-        viewHolder.bookSubTitle.setText(bookSubTitle);
+
     }
 
     @Override

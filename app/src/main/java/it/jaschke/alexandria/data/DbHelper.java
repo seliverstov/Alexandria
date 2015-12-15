@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class DbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "alexandria.db";
 
     public DbHelper(Context context) {
@@ -26,7 +26,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 AlexandriaContract.BookEntry.SUBTITLE + " TEXT ," +
                 AlexandriaContract.BookEntry.DESC + " TEXT ," +
                 AlexandriaContract.BookEntry.IMAGE_URL + " TEXT, "+
-                AlexandriaContract.BookEntry.CREATED_AT + " INTEGER" +
+                AlexandriaContract.BookEntry.CREATED_AT + " INTEGER," +
+                AlexandriaContract.BookEntry.IS_NEW + " INTEGER," +
                 "UNIQUE ("+ AlexandriaContract.BookEntry._ID +") ON CONFLICT IGNORE)";
 
         final String SQL_CREATE_AUTHOR_TABLE = "CREATE TABLE " + AlexandriaContract.AuthorEntry.TABLE_NAME + " ("+
@@ -56,6 +57,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion==1 && newVersion==2){
             db.execSQL("ALTER TABLE "+AlexandriaContract.BookEntry.TABLE_NAME+" ADD COLUMN "+AlexandriaContract.BookEntry.CREATED_AT+" INTEGER");
+            db.execSQL("ALTER TABLE "+AlexandriaContract.BookEntry.TABLE_NAME+" ADD COLUMN "+AlexandriaContract.BookEntry.IS_NEW +" INTEGER");
         }
     }
 }

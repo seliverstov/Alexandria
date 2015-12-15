@@ -43,6 +43,8 @@ public class AlexandriaContract{
 
         public static final String CREATED_AT = "created_at";
 
+        public static final String IS_NEW = "is_new";
+
 
         public static Uri buildBookUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

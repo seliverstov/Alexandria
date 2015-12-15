@@ -12,20 +12,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fullBookCover"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000"/>
+        <ProgressBar
+            android:id="@+id/listBookLoading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/book_cover"
-            android:src="@drawable/ic_launcher" />
+            android:visibility="visible"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            style="@android:style/Widget.ProgressBar.Small" />
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/listBookTitle"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:singleLine="true"
                 android:maxLines="1"
                 android:ellipsize="end"
@@ -36,18 +47,13 @@
                 android:id="@+id/listBookSubTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:singleLine="true"
-                android:ellipsize="end"
                 android:maxLines="1"
+                android:ellipsize="end"
                 android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp"/>
+                android:layout_marginLeft="10dp"
+                android:textAppearance="@android:style/TextAppearance.Small"/>
         </LinearLayout>
-        <ProgressBar
-            android:id="@+id/listBookLoading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:layout_gravity="center_vertical|right"
-            style="@android:style/Widget.ProgressBar.Large" />
     </LinearLayout>
 </android.support.v7.widget.CardView>
