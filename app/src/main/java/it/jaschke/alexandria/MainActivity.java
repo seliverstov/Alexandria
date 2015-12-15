@@ -1,35 +1,21 @@
 package it.jaschke.alexandria;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import it.jaschke.alexandria.api.Callback;
-import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.sync.SyncAdapter;
 
 
@@ -39,33 +25,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout mDrawerLayout;
 
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private NavigationDrawerFragment navigationDrawerFragment;
-
-    /**
-     * Used to store the last screen title. For use in {@link #()}.
-     */
-    private CharSequence title;
     public static boolean IS_TABLET = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*IS_TABLET = isTablet();
-        if(IS_TABLET){
-            setContentView(R.layout.activity_main_tablet);
-        }else {
-            setContentView(R.layout.activity_main);
-        }*/
-
         setContentView(R.layout.activity_main);
-
-
-
-
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -90,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivityForResult(intent,0);
             }
         });
-
-        title = getTitle();
 
         NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -118,9 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         switch(id){
@@ -137,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onItemSelected(String ean) {
-        Log.i(TAG,"EAN: "+ean);
+        Log.i(TAG, "EAN: " + ean);
         if (!IS_TABLET){
             Intent intent = new Intent(this,DetailsActivity.class);
             intent.putExtra(BookDetail.EAN_KEY,ean);
@@ -154,51 +116,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        item.setChecked(true);
         mDrawerLayout.closeDrawers();
-
-       /* FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment nextFragment;
-
-        switch (item.getItemId()){
-            case R.id.navigation_item_books:
-                nextFragment = new ListOfBooks();
+        switch (item.getItemId()) {
+            case R.id.navigation_item_scan: {
+                Intent intent = new Intent(MainActivity.this, ScannerActivity.class);
+                startActivityForResult(intent, 0);
                 break;
-            case R.id.navigation_item_scan:
-                nextFragment = new AddBook();
+            }
+            case R.id.navigation_item_settings: {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
                 break;
-            case R.id.navigation_item_about:
-                nextFragment = new About();
+            }
+            case R.id.navigation_item_about: {
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent);
                 break;
-            default:
-                return true;
-
-        }*/
-
-       /* fragmentManager.beginTransaction()
-                .replace(R.id.container, nextFragment)
-                .addToBackStack((String) title)
-                .commit();*/
+            }
+        }
         return true;
     }
-
-    public void goBack(View view){
-        getSupportFragmentManager().popBackStack();
-    }
-
-    private boolean isTablet() {
-        return (getApplicationContext().getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount()<2){
-            finish();
-        }
-        super.onBackPressed();
-    }
-
-
 }
