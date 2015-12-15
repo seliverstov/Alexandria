@@ -37,11 +37,12 @@ public class SettingsManager {
     }
 
     public String getSortOrderForDb(){
+        final String prefix = AlexandriaContract.BookEntry.IS_NEW+" DESC, ";
         switch (getCurrentSortOrder()){
-            case SORT_ORDER_DATE_ASC: return AlexandriaContract.BookEntry.CREATED_AT +" ASC";
-            case SORT_ORDER_DATE_DESC: return AlexandriaContract.BookEntry.CREATED_AT +" DESC";
-            case SORT_ORDER_TITLE_ASC: return AlexandriaContract.BookEntry.TITLE +" ASC";
-            case SORT_ORDER_TITLE_DESC: return AlexandriaContract.BookEntry.TITLE +" DESC";
+            case SORT_ORDER_DATE_ASC: return prefix + AlexandriaContract.BookEntry.CREATED_AT +" ASC";
+            case SORT_ORDER_DATE_DESC: return prefix + AlexandriaContract.BookEntry.CREATED_AT +" DESC";
+            case SORT_ORDER_TITLE_ASC: return prefix + AlexandriaContract.BookEntry.TITLE +" ASC";
+            case SORT_ORDER_TITLE_DESC: return prefix + AlexandriaContract.BookEntry.TITLE +" DESC";
             default: return null;
         }
     }
