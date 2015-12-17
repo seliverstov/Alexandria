@@ -2,7 +2,35 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">?attr/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
+        <item name="divider">@color/divider</item>
+        <item name="toolbarStyle">@style/Toolbar</item>
+    </style>
+
+    <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="background">?attr/colorPrimary</item>
+        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
+    </style>
+
+    <style name="CardView" parent="CardView">
+        <item name="android:theme">@style/CardView.Light</item>
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="contentPadding">2dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardCornerRadius">6dp</item>
+    </style>
+
+    <style name="CircleImageView">
+        <item name="civ_border_width">1dp</item>
+        <item name="civ_border_color">@color/divider</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:src">@drawable/ic_launcher</item>
     </style>
 
 </resources>

@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone"
-        android:textColor="@android:color/white"
         android:text="Book was not found"
         android:paddingTop="?attr/actionBarSize"/>
 </FrameLayout>

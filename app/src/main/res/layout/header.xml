@@ -2,9 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
-    android:background="?attr/colorPrimaryDark"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:layout_height="@dimen/navigation_drawer_width"
     android:gravity="bottom">
     <ImageView
         android:layout_width="match_parent"
@@ -15,8 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/activity_horizontal_margin"
         android:text="@string/drawer_header_text"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
-
 </RelativeLayout>
