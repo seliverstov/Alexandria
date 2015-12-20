@@ -35,10 +35,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar =  getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar!=null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-        IS_TABLET = (findViewById(R.id.book_container)==null)?false:true;
+        IS_TABLET = findViewById(R.id.book_container)!=null;
         if (IS_TABLET) {
             if (savedInstanceState == null || getSupportFragmentManager().findFragmentByTag(BOOK_FRAGMENT_TAG) == null) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.book_container, new BookDetail(), BOOK_FRAGMENT_TAG).commit();

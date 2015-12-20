@@ -11,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
@@ -37,7 +38,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     public static final String EAN_KEY = "it.jaschke.alexandria.EAN";
     private final int LOADER_ID = 10;
 
-    private View rootView;
     private String ean;
     private String bookTitle;
     private ShareActionProvider shareActionProvider;
@@ -65,6 +65,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
+        View rootView;
         if (arguments != null) {
             ean = arguments.getString(BookDetail.EAN_KEY);
         }else{
@@ -78,7 +79,8 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         if (getActivity() instanceof DetailsActivity) {
             ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ActionBar toolbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (toolbar!=null) toolbar.setDisplayHomeAsUpEnabled(true);
         }
 
         mDelete.setOnClickListener(new View.OnClickListener() {
@@ -157,9 +159,9 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(imgUrl!=null && Patterns.WEB_URL.matcher(imgUrl).matches()){
             Uri url = Uri.parse(imgUrl);
-            Picasso.with(getActivity()).load(url).into(mCover);
+            Picasso.with(getActivity()).load(url).placeholder(R.drawable.alexandria).error(R.drawable.alexandria).into(mCover);
         }else{
-            mCover.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_launcher));
+            mCover.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.alexandria));
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));

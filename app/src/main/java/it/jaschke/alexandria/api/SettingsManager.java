@@ -28,8 +28,7 @@ public class SettingsManager {
     }
 
     public int getCurrentSortOrder(){
-        int sortOrder = Integer.valueOf(mSp.getString(mContext.getString(R.string.pref_sort_key), String.valueOf(SORT_ORDER_DATE_ASC)));
-        return sortOrder;
+        return Integer.valueOf(mSp.getString(mContext.getString(R.string.pref_sort_key), String.valueOf(SORT_ORDER_DATE_ASC)));
     }
 
     public void setSortOrder(int sortOrder){
@@ -48,8 +47,7 @@ public class SettingsManager {
     }
 
     public int getCurrentSearchViewMode(){
-        int searchViewMode = Integer.valueOf(mSp.getString(mContext.getString(R.string.pref_search_key), String.valueOf(SEARCH_VIEW_COLLAPSED)));
-        return searchViewMode;
+        return Integer.valueOf(mSp.getString(mContext.getString(R.string.pref_search_key), String.valueOf(SEARCH_VIEW_COLLAPSED)));
     }
 
     public void setCurrentSearchViewMode(int searchViewMode){

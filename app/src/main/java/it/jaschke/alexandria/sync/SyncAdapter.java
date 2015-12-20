@@ -44,8 +44,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "onPerformSync");
+        Cursor bookEntry = null;
         try{
-            Cursor bookEntry = provider.query(
+             bookEntry = provider.query(
                     AlexandriaContract.BookEntry.CONTENT_URI,
                     new String[]{AlexandriaContract.BookEntry._ID}, // leaving "columns" null just returns all the columns.
                     AlexandriaContract.BookEntry.IS_NEW+" = ?", // cols for "where" clause
@@ -53,7 +54,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                     null  // sort order
             );
 
-            if (!bookEntry.moveToFirst()) return;
+            if (bookEntry==null || !bookEntry.moveToFirst()) {
+                if (bookEntry!=null) bookEntry.close();
+                return;
+            }
             Log.i(TAG,"onPerformSync: waiting to sync "+bookEntry.getCount());
             do{
                 String ean = String.valueOf(bookEntry.getLong(bookEntry.getColumnIndex(AlexandriaContract.BookEntry._ID)));
@@ -79,7 +83,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                     urlConnection.connect();
 
                     InputStream inputStream = urlConnection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     if (inputStream == null) {
                         return;
                     }
@@ -168,14 +172,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                         messageIntent.putExtra(ListOfBooks.MESSAGE_IS_FOUND,false);
                         LocalBroadcastManager.getInstance(getContext().getApplicationContext()).sendBroadcast(messageIntent);
                     }
-                } catch (JSONException e) {
-                    Log.e(TAG, "Error ", e);
-                } catch (RemoteException e){
+                } catch (JSONException | RemoteException e) {
                     Log.e(TAG, "Error ", e);
                 }
             }while(bookEntry.moveToNext());
         }catch (RemoteException e){
             Log.e(TAG, "Error ", e);
+        }finally {
+            if (bookEntry!=null && !bookEntry.isClosed()) bookEntry.close();
         }
 
     }

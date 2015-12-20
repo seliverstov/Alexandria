@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +55,7 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
         String imgUrl = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if (imgUrl!=null) {
             Uri url = Uri.parse(imgUrl);
-            Picasso.with(mContext).load(url).into(viewHolder.bookCover);
+            Picasso.with(mContext).load(url).placeholder(R.drawable.ic_launcher).error(R.drawable.ic_launcher).into(viewHolder.bookCover);
         }else{
             viewHolder.bookCover.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.ic_launcher));
         }
@@ -65,7 +64,7 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
 
         final String bookTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
 
-        final String bookSubTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
+        //final String bookSubTitle = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
 
         final int is_new = cursor.getInt(cursor.getColumnIndex(AlexandriaContract.BookEntry.IS_NEW));
 
@@ -104,7 +103,6 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        return new ViewHolder(view);
     }
 }

@@ -1,33 +1,11 @@
 package it.jaschke.alexandria.services;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.IntentService;
-import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.ResultReceiver;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import it.jaschke.alexandria.ListOfBooks;
-import it.jaschke.alexandria.MainActivity;
-import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.sync.SyncAdapter;
 
@@ -93,16 +71,16 @@ public class BookService extends IntentService {
                 null  // sort order
         );
 
-        if(bookEntry.getCount()>0){
-            bookEntry.close();
+        if(bookEntry==null || bookEntry.getCount()>0){
+            if (bookEntry!=null) bookEntry.close();
             Intent messageIntent = new Intent(ListOfBooks.MESSAGE_EVENT);
             messageIntent.putExtra(ListOfBooks.MESSAGE_KEY,ean);
             messageIntent.putExtra(ListOfBooks.MESSAGE_IN_LIST,true);
             LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(messageIntent);
             return;
+        }else{
+            bookEntry.close();
         }
-
-        bookEntry.close();
 
         ContentValues values= new ContentValues();
         values.put(AlexandriaContract.BookEntry._ID, ean);

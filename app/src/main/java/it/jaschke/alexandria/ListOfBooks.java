@@ -23,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +49,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public static final String SCAN_RESULT = "it.jaschke.alexandria.SCAN_RESULT";
 
     private BooksAdapter bookListAdapter;
-    private RecyclerView bookList;
     private SearchView mSearchView;
     private TextView mBookNotFound;
 
@@ -74,7 +72,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         bookListAdapter = new BooksAdapter(getActivity(), null);
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
 
-        bookList = (RecyclerView) rootView.findViewById(R.id.listOfBooks);
+        RecyclerView bookList = (RecyclerView) rootView.findViewById(R.id.listOfBooks);
         bookList.setAdapter(bookListAdapter);
         bookList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -116,7 +114,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
             mBookNotFound.setVisibility(View.VISIBLE);
         }else {
-            Log.i(TAG,"data count "+ data.getCount());
             mBookNotFound.setVisibility(View.GONE);
             bookListAdapter.swapCursor(data);
         }
@@ -181,7 +178,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction()==MESSAGE_EVENT){
+                if (intent.getAction().equals(MESSAGE_EVENT)){
                     String ean = intent.getStringExtra(MESSAGE_KEY);
                     if (intent.getBooleanExtra(MESSAGE_IN_LIST,false)){
                         ((Callback)getActivity()).onItemSelected(ean);

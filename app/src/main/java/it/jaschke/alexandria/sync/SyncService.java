@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import java.util.Objects;
-
 /**
  * Created by a.g.seliverstov on 14.12.2015.
  */
