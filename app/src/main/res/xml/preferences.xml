@@ -11,6 +11,7 @@
         android:title="@string/pref_sort"
         android:entries="@array/pref_sort_options"
         android:entryValues="@array/pref_sort_values"
+        android:defaultValue="@string/pref_sort_default"
         />
 
     <ListPreference
@@ -18,6 +19,7 @@
         android:title="@string/pref_search"
         android:entries="@array/pref_search_options"
         android:entryValues="@array/pref_search_values"
+        android:defaultValue="@string/pref_search_default"
         />
 
 </PreferenceScreen>

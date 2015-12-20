@@ -165,7 +165,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
             mSearchView.setIconifiedByDefault(settingsManager.isSearchViewIconified());
             mSearchView.setIconified(settingsManager.isSearchViewIconified());
-            mSearchView.clearFocus();
+            //mSearchView.clearFocus();
             mSearchView.setQueryHint(getActivity().getString(R.string.search_hint));
         }
     }
@@ -223,7 +223,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         }else if (key.equals(getActivity().getString(R.string.pref_search_key))){
             mSearchView.setIconifiedByDefault(settingsManager.isSearchViewIconified());
             mSearchView.setIconified(settingsManager.isSearchViewIconified());
-            mSearchView.clearFocus();
+            //mSearchView.clearFocus();
         }
     }
 }

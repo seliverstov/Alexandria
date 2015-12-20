@@ -159,9 +159,9 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(imgUrl!=null && Patterns.WEB_URL.matcher(imgUrl).matches()){
             Uri url = Uri.parse(imgUrl);
-            Picasso.with(getActivity()).load(url).placeholder(R.drawable.alexandria).error(R.drawable.alexandria).into(mCover);
+            Picasso.with(getActivity()).load(url).placeholder(R.drawable.no_cover).error(R.drawable.no_cover).into(mCover);
         }else{
-            mCover.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.alexandria));
+            mCover.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.no_cover));
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));

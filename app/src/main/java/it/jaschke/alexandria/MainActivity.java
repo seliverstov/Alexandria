@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.support.v7.widget.SearchView;
 
 import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.sync.SyncAdapter;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
 
+
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +72,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        if (searchItem!=null) {
+            final SearchView searchView = (SearchView)searchItem.getActionView();
+            if (searchView!=null){
+                mDrawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                    }
+
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        if (!searchView.isIconified() && searchView.hasFocus()){
+                            searchView.clearFocus();
+                        }
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+
+                    }
+
+                    @Override
+                    public void onDrawerStateChanged(int newState) {
+
+                    }
+                });
+            }
+        }
+
+
         return true;
     }
 

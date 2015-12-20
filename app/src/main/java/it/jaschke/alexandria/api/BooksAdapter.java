@@ -55,7 +55,7 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
         String imgUrl = cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if (imgUrl!=null) {
             Uri url = Uri.parse(imgUrl);
-            Picasso.with(mContext).load(url).placeholder(R.drawable.ic_launcher).error(R.drawable.ic_launcher).into(viewHolder.bookCover);
+            Picasso.with(mContext).load(url).placeholder(R.drawable.no_cover).error(R.drawable.no_cover).into(viewHolder.bookCover);
         }else{
             viewHolder.bookCover.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.ic_launcher));
         }
