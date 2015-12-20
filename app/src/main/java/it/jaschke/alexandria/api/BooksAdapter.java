@@ -69,9 +69,15 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
 
         final int is_new = cursor.getInt(cursor.getColumnIndex(AlexandriaContract.BookEntry.IS_NEW));
 
+        final String ISBNTitle = mContext.getString(R.string.isbn_title);
+
+        final String loadingTitle = mContext.getString(R.string.loading_title);
+
+        final String bookNotLoadedMsg = mContext.getString(R.string.book_not_loaded_yet);
+
         if (is_new!=1) {
             viewHolder.bookTitle.setText(bookTitle);
-            viewHolder.bookSubTitle.setText("ISBN: "+ean);
+            viewHolder.bookSubTitle.setText(String.format(ISBNTitle,ean));
             viewHolder.loading.setVisibility(View.GONE);
             viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -81,13 +87,13 @@ public class BooksAdapter extends CursorRecyclerViewAdapter<BooksAdapter.ViewHol
                 }
             });
         }else{
-            viewHolder.bookTitle.setText("ISBN: "+ean);
-            viewHolder.bookSubTitle.setText("Loading...");
+            viewHolder.bookTitle.setText(String.format(ISBNTitle,ean));
+            viewHolder.bookSubTitle.setText(loadingTitle);
             viewHolder.loading.setVisibility(View.VISIBLE);
             viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(mContext,"Book with ISBN:"+ean+" isn't loaded yet!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext,String.format(bookNotLoadedMsg,ean),Toast.LENGTH_SHORT).show();
                 }
             });
         }

@@ -1,7 +1,6 @@
 package it.jaschke.alexandria;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -21,7 +20,7 @@ import it.jaschke.alexandria.sync.SyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Callback {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String BOOK_FRAGMENT_TAG = "BOOK_FRAGMENT_TAG";
+    private static final String BOOK_FRAGMENT_TAG = "it.jaschke.alexandria.BOOK_FRAGMENT_TAG";
 
     private DrawerLayout mDrawerLayout;
 
@@ -53,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ScannerActivity.class);
-                startActivityForResult(intent,0);
+                startActivityForResult(intent,ListOfBooks.SCAN_REQUEST);
             }
         });
 
@@ -135,5 +134,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        getSupportFragmentManager().findFragmentById(R.id.list).onActivityResult(requestCode,resultCode,data);
     }
 }

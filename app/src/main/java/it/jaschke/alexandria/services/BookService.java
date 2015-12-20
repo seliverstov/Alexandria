@@ -95,6 +95,10 @@ public class BookService extends IntentService {
 
         if(bookEntry.getCount()>0){
             bookEntry.close();
+            Intent messageIntent = new Intent(ListOfBooks.MESSAGE_EVENT);
+            messageIntent.putExtra(ListOfBooks.MESSAGE_KEY,ean);
+            messageIntent.putExtra(ListOfBooks.MESSAGE_IN_LIST,true);
+            LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(messageIntent);
             return;
         }
 

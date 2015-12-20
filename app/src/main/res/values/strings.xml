@@ -39,17 +39,22 @@
     <string name="title_activity_about">About this App</string>
 
     <string name="pref_sort">List Sort Order</string>
-    <string name="pref_sort_key">pref_sort_key</string>
-    <string name="pref_sort_default">1</string>
+    <string name="pref_sort_key"  translatable="false">pref_sort_key</string>
+    <string name="pref_sort_default" translatable="false">1</string>
     <string name="sort_by_date_asc">Sort by Date (asc)</string>
     <string name="sort_by_date_desc">Sort by Date (desc)</string>
     <string name="sort_by_title_asc">Sort by Title (asc)</string>
     <string name="sort_by_title_desc">Sort by Title (desc)</string>
 
     <string name="pref_search">Search View Mode</string>
-    <string name="pref_search_key">pref_search_key</string>
-    <string name="pref_search_default">1</string>
+    <string name="pref_search_key"  translatable="false">pref_search_key</string>
+    <string name="pref_search_default"  translatable="false">1</string>
     <string name="search_expanded">Expanded</string>
     <string name="search_collapsed">Collapsed</string>
     <string name="search_hint">Enter ISBN to add new book</string>
+    <string name="isbn_title">ISBN: %s</string>
+    <string name="loading_title">Loading...</string>
+    <string name="book_not_loaded_yet">Book with ISBN: %s isn\'t loaded yet!</string>
+    <string name="book_was_added">Book %s was added to your list</string>
+    <string name="book_not_found">Book %s was not found></string>
 </resources>

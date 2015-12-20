@@ -8,6 +8,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +34,7 @@ import it.jaschke.alexandria.services.BookService;
 
 public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String EAN_KEY = "EAN";
+    public static final String EAN_KEY = "it.jaschke.alexandria.EAN";
     private final int LOADER_ID = 10;
 
     private View rootView;
@@ -101,7 +102,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         MenuItem menuItem = menu.findItem(R.id.action_share);
         shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        //shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + bookTitle);
         shareActionProvider.setShareIntent(shareIntent);
@@ -131,7 +131,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         if (shareActionProvider!=null) {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            //shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + bookTitle);
             shareActionProvider.setShareIntent(shareIntent);
@@ -160,7 +159,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             Uri url = Uri.parse(imgUrl);
             Picasso.with(getActivity()).load(url).into(mCover);
         }else{
-            mCover.setImageDrawable(getActivity().getDrawable(R.drawable.ic_launcher));
+            mCover.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_launcher));
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));

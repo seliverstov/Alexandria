@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -31,6 +30,7 @@ import android.widget.Toast;
 import java.util.regex.Pattern;
 
 import it.jaschke.alexandria.api.BooksAdapter;
+import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.api.SettingsManager;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
@@ -40,11 +40,14 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     private static final String TAG = ListOfBooks.class.getSimpleName();
 
-    private static final int SCAN_REQUEST = 0;
+    public static final int SCAN_REQUEST = 0;
 
-    public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
-    public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
-    public static final String MESSAGE_IS_FOUND = "MESSAGE_IS_FOUND";
+    public static final String MESSAGE_EVENT = "it.jaschke.alexandria.MESSAGE_EVENT";
+    public static final String MESSAGE_KEY = "it.jaschke.alexandria.MESSAGE_EXTRA";
+    public static final String MESSAGE_IS_FOUND = "it.jaschke.alexandria.MESSAGE_IS_FOUND";
+    public static final String MESSAGE_IN_LIST = "it.jaschke.alexandria.MESSAGE_IN_LIST";
+
+    public static final String SCAN_RESULT = "it.jaschke.alexandria.SCAN_RESULT";
 
     private BooksAdapter bookListAdapter;
     private RecyclerView bookList;
@@ -54,8 +57,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     private BroadcastReceiver messageReceiver;
 
     private SettingsManager settingsManager;
-
-    private int position = ListView.INVALID_POSITION;
 
     public static final int LOADER_ID = 10;
 
@@ -118,9 +119,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             Log.i(TAG,"data count "+ data.getCount());
             mBookNotFound.setVisibility(View.GONE);
             bookListAdapter.swapCursor(data);
-            if (position != ListView.INVALID_POSITION) {
-                bookList.smoothScrollToPosition(position);
-            }
         }
     }
 
@@ -185,9 +183,13 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction()==MESSAGE_EVENT){
                     String ean = intent.getStringExtra(MESSAGE_KEY);
-                    Boolean isFound = intent.getBooleanExtra(MESSAGE_IS_FOUND,false);
-                    String message = "Book %s was %s";
-                    Toast.makeText(context,(isFound)?String.format(message,ean," added to your list"):String.format(message,ean," not found"),Toast.LENGTH_SHORT).show();
+                    if (intent.getBooleanExtra(MESSAGE_IN_LIST,false)){
+                        ((Callback)getActivity()).onItemSelected(ean);
+                    }else {
+                        Boolean isFound = intent.getBooleanExtra(MESSAGE_IS_FOUND, false);
+                        String message = (isFound) ? getActivity().getString(R.string.book_was_added) : getActivity().getString(R.string.book_not_found);
+                        Toast.makeText(context, String.format(message, ean), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         };
@@ -199,11 +201,11 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "requestCode " + requestCode + ", resultCode " + resultCode);
         if (requestCode==SCAN_REQUEST && resultCode == Activity.RESULT_OK){
-            String query = data.getStringExtra(AddBook.SCAN_CONTENTS);
+            String query = data.getStringExtra(SCAN_RESULT);
             Log.i(TAG, query);
-            mSearchView.setQuery(query, false);
-            mSearchView.onActionViewExpanded();
+            mSearchView.setQuery(query, true);
         }
     }
 
