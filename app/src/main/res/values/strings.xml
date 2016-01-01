@@ -48,4 +48,5 @@
     <string name="cd_book_cover">Book Cover</string>
     <string name="cd_alexandris_library">Alexandria Library</string>
     <string name="action_delete">Delete</string>
+    <string name="server_error">Can\'t find book with ISBN %s due to server error. Try again late.</string>
 </resources>

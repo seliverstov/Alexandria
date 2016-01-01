@@ -67,12 +67,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                 String bookJsonString = null;
 
                 try {
-                    final String FORECAST_BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
+                    final String BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
                     final String QUERY_PARAM = "q";
 
                     final String ISBN_PARAM = "isbn:" + ean;
 
-                    Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                    Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                             .appendQueryParameter(QUERY_PARAM, ISBN_PARAM)
                             .build();
 
@@ -101,6 +101,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                     bookJsonString = buffer.toString();
                 } catch (Exception e) {
                     Log.e(TAG, "Error ", e);
+                    /*
+                    * Error case: Server error
+                    * */
+                    sendServerErrorMessage(ean);
                 } finally {
                     if (urlConnection != null) {
                         urlConnection.disconnect();
@@ -166,6 +170,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                         messageIntent.putExtra(ListOfBooks.MESSAGE_IS_FOUND,true);
                         LocalBroadcastManager.getInstance(getContext().getApplicationContext()).sendBroadcast(messageIntent);
                     }else{
+                        /*
+                        * Error case: Book Not Found
+                        * */
                         provider.delete(AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(ean)),null,null);
                         Intent messageIntent = new Intent(ListOfBooks.MESSAGE_EVENT);
                         messageIntent.putExtra(ListOfBooks.MESSAGE_KEY,ean);
@@ -174,8 +181,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
                     }
                 } catch (JSONException | RemoteException e) {
                     Log.e(TAG, "Error ", e);
+                    /*
+                    * Error case: Server error
+                    * */
+                    sendServerErrorMessage(ean);
                 }
-            }while(bookEntry.moveToNext());
+            } while (bookEntry.moveToNext());
         }catch (RemoteException e){
             Log.e(TAG, "Error ", e);
         }finally {
@@ -184,7 +195,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter{
 
     }
 
-
+    void sendServerErrorMessage(String ean){
+        Intent messageIntent = new Intent(ListOfBooks.MESSAGE_EVENT);
+        messageIntent.putExtra(ListOfBooks.MESSAGE_KEY,ean);
+        messageIntent.putExtra(ListOfBooks.MESSAGE_SERVER_ERROR,true);
+        LocalBroadcastManager.getInstance(getContext().getApplicationContext()).sendBroadcast(messageIntent);
+    }
 
     private void writeBackBook(ContentProviderClient provider,String ean, String title, String subtitle, String desc, String imgUrl) throws RemoteException {
         ContentValues values= new ContentValues();

@@ -45,6 +45,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public static final String MESSAGE_KEY = "it.jaschke.alexandria.MESSAGE_EXTRA";
     public static final String MESSAGE_IS_FOUND = "it.jaschke.alexandria.MESSAGE_IS_FOUND";
     public static final String MESSAGE_IN_LIST = "it.jaschke.alexandria.MESSAGE_IN_LIST";
+    public static final String MESSAGE_SERVER_ERROR = "it.jaschke.alexandria.MESSAGE_SERVER_ERROR";
 
     public static final String SCAN_RESULT = "it.jaschke.alexandria.SCAN_RESULT";
 
@@ -180,7 +181,10 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(MESSAGE_EVENT)){
                     String ean = intent.getStringExtra(MESSAGE_KEY);
-                    if (intent.getBooleanExtra(MESSAGE_IN_LIST,false)){
+                    if (intent.getBooleanExtra(MESSAGE_SERVER_ERROR,false)){
+                        String message = getActivity().getString(R.string.server_error);
+                        Toast.makeText(context, String.format(message, ean), Toast.LENGTH_SHORT).show();
+                    }else if (intent.getBooleanExtra(MESSAGE_IN_LIST,false)){
                         ((Callback)getActivity()).onItemSelected(ean);
                     }else {
                         Boolean isFound = intent.getBooleanExtra(MESSAGE_IS_FOUND, false);
