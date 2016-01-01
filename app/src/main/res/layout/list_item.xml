@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <de.hdodenhof.circleimageview.CircleImageView
+            android:contentDescription="@string/cd_book_cover"
             android:id="@+id/fullBookCover"
             style="@style/CircleImageView"/>
         <LinearLayout

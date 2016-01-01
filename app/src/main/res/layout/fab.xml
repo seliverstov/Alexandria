@@ -8,4 +8,5 @@
     android:layout_margin="@dimen/activity_horizontal_margin"
     android:src="@drawable/ic_barcode"
     app:layout_anchor="@id/list"
+    android:contentDescription="@string/action_scan"
     app:layout_anchorGravity="bottom|right|end" />

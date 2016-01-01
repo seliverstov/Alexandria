@@ -111,6 +111,7 @@
         app:layout_anchorGravity="bottom|right|end"
         android:layout_margin="@dimen/activity_horizontal_margin"
         android:src="@drawable/ic_action_discard"
+        android:contentDescription="@string/action_delete"
         android:clickable="true"/>
 
 </android.support.design.widget.CoordinatorLayout>
